@@ -109,9 +109,26 @@ function saveUserCredentialsInLocalStorage() {
 
 function updateUIOnUserLogin() {
   console.debug("updateUIOnUserLogin");
-
-  $allStoriesList.show();
+  $loginForm.hide();
+  $signupForm.hide();
   $('#login-req').show();
-
   updateNavOnLogin();
+  hidePageComponents();
+  putStoriesOnPage();
 }
+
+function favClick(e){
+  currentUser.addFavorite(e.target.parentElement.parentElement.id);
+  e.target.classList.toggle('far');
+  e.target.classList.toggle('fas');
+
+}
+
+function removeFavClick(e){
+  currentUser.removeFavorite(e.target.parentElement.parentElement.id);
+  e.target.classList.toggle('far');
+  e.target.classList.toggle('fas');
+}
+
+$allStoriesList.on('click', '.far', favClick);
+$allStoriesList.on('click', '.fas', removeFavClick);

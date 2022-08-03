@@ -25,7 +25,7 @@ class Story {
 
   getHostName() {
     // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+    return this.url.split('//')[1];
   }
 }
 
@@ -75,10 +75,10 @@ class StoryList {
 
   async addStory(user, newStory) {
     const postedStory = await axios.post(`${BASE_URL}/stories`,
-    {
-      token: user.loginToken,
-      story: newStory
-    });
+      {
+        token: user.loginToken,
+        story: newStory
+      });
     return new Story(postedStory.data.story);
   }
 }
@@ -95,13 +95,13 @@ class User {
    */
 
   constructor({
-                username,
-                name,
-                createdAt,
-                favorites = [],
-                ownStories = []
-              },
-              token) {
+    username,
+    name,
+    createdAt,
+    favorites = [],
+    ownStories = []
+  },
+    token) {
     this.username = username;
     this.name = name;
     this.createdAt = createdAt;
@@ -197,5 +197,18 @@ class User {
       console.error("loginViaStoredCredentials failed", err);
       return null;
     }
+  }
+  async addFavorite(storyId) {
+    console.debug('addFavorite');
+    const fav = await axios.post(`${BASE_URL}/users/${this.username}/favorites/${storyId}`, { token: this.loginToken });
+    const response = await axios.get(`${BASE_URL}/stories/${storyId}`)
+    this.favorites.push(new Story(response.data.story));
+
+  }
+  async removeFavorite(storyId) {
+    console.debug('removeFavorite');
+    const fav = await axios.delete(`${BASE_URL}/users/${this.username}/favorites/${storyId}`, { data: {token: this.loginToken} });
+    this.favorites = this.favorites.filter(f => f.storyId !== storyId);
+
   }
 }

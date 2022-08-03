@@ -23,8 +23,10 @@ function generateStoryMarkup(story) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
+
   return $(`
       <li id="${story.storyId}">
+        <span class = 'star'> <i class = 'far fa-star'></i></span>
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
         </a>
@@ -37,15 +39,18 @@ function generateStoryMarkup(story) {
 
 /** Gets list of stories from server, generates their HTML, and puts on page. */
 
-function putStoriesOnPage() {
+function putStoriesOnPage(stories = storyList.stories) {
   console.debug("putStoriesOnPage");
 
   $allStoriesList.empty();
 
   // loop through all of our stories and generate HTML for them
-  for (let story of storyList.stories) {
+  for (let story of stories) {
     const $story = generateStoryMarkup(story);
     $allStoriesList.append($story);
+    if (currentUser && !currentUser.favorites.every(f => f.storyId !== story.storyId)){
+      $(`#${story.storyId} span i`).toggleClass(['far', 'fas']);
+    }
   }
 
   $allStoriesList.show();
@@ -56,6 +61,7 @@ async function submitStory (e){
   const [author, title, url] = [$('#submit-author').val(), $('#submit-title').val(), $('#submit-url').val()]
   const newStory = await storyList.addStory(currentUser, {title, author, url});
   storyList.stories.unshift(newStory);
+  currentUser.ownStories.push(newStory);
   $('#submit-form').hide();
   navAllStories();
   putStoriesOnPage();
