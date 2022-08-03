@@ -50,3 +50,16 @@ function putStoriesOnPage() {
 
   $allStoriesList.show();
 }
+
+async function submitStory (e){
+  e.preventDefault();
+  const [author, title, url] = [$('#submit-author').val(), $('#submit-title').val(), $('#submit-url').val()]
+  const newStory = await storyList.addStory(currentUser, {title, author, url});
+  storyList.stories.unshift(newStory);
+  $('#submit-form').hide();
+  navAllStories();
+  putStoriesOnPage();
+}
+
+$('#submit-form').on('submit', submitStory);
+
