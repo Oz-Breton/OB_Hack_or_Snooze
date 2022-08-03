@@ -9,6 +9,7 @@
 function navAllStories(evt) {
   console.debug("navAllStories", evt);
   hidePageComponents();
+  page = 'story';
   putStoriesOnPage();
 }
 
@@ -17,10 +18,20 @@ $body.on("click", "#nav-all", navAllStories);
 function navFavStories(evt) {
   console.debug("navFavStories", evt);
   hidePageComponents();
+  page = 'favorite';
   putStoriesOnPage(currentUser.favorites);
 }
 
 $body.on("click", "#nav-fav", navFavStories);
+
+function navOwnStories(evt) {
+  console.debug("navOwnStories", evt);
+  hidePageComponents();
+  page = 'own';
+  putStoriesOnPage(currentUser.ownStories);
+}
+
+$body.on("click", "#nav-own", navOwnStories);
 
 /** Show login/signup on click on "login" */
 

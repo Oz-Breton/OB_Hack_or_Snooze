@@ -8,7 +8,6 @@ let storyList;
 async function getAndShowStoriesOnStart() {
   storyList = await StoryList.getStories();
   $storiesLoadingMsg.remove();
-
   putStoriesOnPage();
 }
 
@@ -19,13 +18,14 @@ async function getAndShowStoriesOnStart() {
  * Returns the markup for the story.
  */
 
-function generateStoryMarkup(story) {
+function generateStoryMarkup(story, own = false) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
 
   return $(`
       <li id="${story.storyId}">
+        ${own ? '<span class = "trash can"><i class = "fas fa-trash-alt"></i> </span>': ''}
         <span class = 'star'> <i class = 'far fa-star'></i></span>
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
@@ -46,7 +46,11 @@ function putStoriesOnPage(stories = storyList.stories) {
 
   // loop through all of our stories and generate HTML for them
   for (let story of stories) {
-    const $story = generateStoryMarkup(story);
+    let own = false;
+    if (currentUser && !currentUser.ownStories.every(st => st.storyId !== story.storyId)){
+      own = true;
+    }
+    const $story = generateStoryMarkup(story, own);
     $allStoriesList.append($story);
     if (currentUser && !currentUser.favorites.every(f => f.storyId !== story.storyId)){
       $(`#${story.storyId} span i`).toggleClass(['far', 'fas']);
@@ -64,8 +68,28 @@ async function submitStory (e){
   currentUser.ownStories.push(newStory);
   $('#submit-form').hide();
   navAllStories();
+  page = 'story'
   putStoriesOnPage();
 }
 
 $('#submit-form').on('submit', submitStory);
+
+async function removeOwnClick(e){
+  const id = e.target.parentElement.parentElement.id;
+  await storyList.deleteStory(currentUser, id);
+  hidePageComponents();
+  switch (page){
+    case 'story':
+      putStoriesOnPage();
+      break;
+    case 'favorite':
+      putStoriesOnPage(currentUser.favorites);
+      break;
+    case 'own':
+      putStoriesOnPage(currentUser.ownStories);
+      break;
+  }
+}
+
+$allStoriesList.on('click', '.fa-trash-alt', removeOwnClick);
 

@@ -57,6 +57,7 @@ $signupForm.on("submit", signup);
  */
 
 function logout(evt) {
+  page = 'story'
   console.debug("logout", evt);
   localStorage.clear();
   location.reload();
@@ -114,6 +115,7 @@ function updateUIOnUserLogin() {
   $('#login-req').show();
   updateNavOnLogin();
   hidePageComponents();
+  page = 'story';
   putStoriesOnPage();
 }
 
@@ -130,5 +132,5 @@ function removeFavClick(e){
   e.target.classList.toggle('fas');
 }
 
-$allStoriesList.on('click', '.far', favClick);
-$allStoriesList.on('click', '.fas', removeFavClick);
+$allStoriesList.on('click', '.far.fa-star', favClick);
+$allStoriesList.on('click', '.fas.fa-star', removeFavClick);
